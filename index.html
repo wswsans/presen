@@ -3,7 +3,7 @@
 	<head>
 		<title>プレゼンサイト</title>
 		<meta charset="utf-8">
-		<script type="text/javascript" src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+		<script type="text/javascript" src="/Seika/jquery.min.js"></script>
 		<style type="text/css">
 			img#presen {
 				height: 85%;
@@ -11,10 +11,17 @@
 			}
 		</style>
 		<script type="text/javascript">
-		var date, voice, count, SRC, textData, showText, i, stopped, wait
-		stopped = true
-		date = new Date(); SRC = 'Presens/' + date.getFullYear() + ('0' + (date.getMonth() + 1)).slice(-2) + 22 + '/'
-		count = 1; voice = new Audio()
+		var count, stopped,
+			date, SRC,
+			voice,
+			textData, showText, i, wait
+		count = 1; stopped = true
+		date = new Date()
+		date.getDate = function () {
+			return 22
+		}
+		SRC = 'Presens/' + date.getFullYear() + ('0' + (date.getMonth() + 1)).slice(-2) + date.getDate() + '/'
+		voice = new Audio()
 		$.ajax(SRC + 'script.txt', 'post').done(function (beforeData) { textData = beforeData.split('\n') })
 		showText = function () {
 			wait = 150
@@ -32,6 +39,7 @@
 		window.onload = function () {
 			$('button#next')[0].onclick = function () {
 				if (!stopped) { console.log('No!') } else {
+					if (textData[count - 1] == undefined) { count = 1 }
 					$('button#next')[0].innerText = '...'
 					stopped = false
 					$('img#presen')[0].src = SRC + count + '.jpg'
