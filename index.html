@@ -5,19 +5,37 @@
 		<meta charset="utf-8">
 		<script type="text/javascript" src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
 		<style type="text/css">
+			body {
+				margin: 0px;
+				padding: 0px;
+			}
 			error {
 				color: #B9000A;
 			}
-			dialog {
-				padding: 0;
-				border: 0;
+			div#shadow {
+				position: absolute;
+				z-index: 2147483646;
+				background-color: rgba(0, 0, 0, 0.4);
+			}
+			div#dialog{
+				/* 中央よせ */
+				position: absolute;
+  				top: 50%;
+  				left: 50%;
+  				-webkit-transform: translateY(-50%) translateX(-50%);
+  				transform: translateY(-50%) translateX(-50%);
+  				/* original */
+				font-size: 15px;
+				padding: 10px;
+				/* dialog */
+				background-color: #fff;
 				border-radius: 0.6rem;
 				box-shadow: 0 0 1em black;
+				border: 1px solid #fff;
+				z-index: 2147483647;
 			}
-						 
-			dialog::backdrop {
-				/* 背景を半透明のブラックにする */
-				background-color: rgba(0, 0, 0, 0.4);
+			div#dialog h3 {
+				border-bottom: 1px solid #BFBFBF;
 			}
 		</style>
 		<script type="text/javascript">
@@ -171,38 +189,45 @@
 						$('button#stop')[0].onclick()
 						break
 					case 'Slash':
-						if (event.metaKey || event.ctrlKey) { ($('dialog#help')[0].open) ? $('dialog#help')[0].close() : $('dialog#help')[0].showModal() }
+						if (event.metaKey || event.ctrlKey) {
+							$('div#shadow')[0].style.display = $('div#dialog')[0].style.display = ($('div#dialog')[0].style.display == 'block') ? 'none' : 'block'
+						}
 						break
 					case 'Escape':
-						if (event.metaKey || event.ctrlKey) { $('dialog#help')[0].close() }
+						$('div#shadow')[0].style.display = $('div#dialog')[0].style.display = 'none'
 						break
 				}
 			}
+			$('div#shadow').css({"height": document.documentElement.clientHeight + "px", "width": document.documentElement.clientWidth + "px"})
+			$('div#shadow')[0].style.display = $('div#dialog')[0].style.display = 'none'
 		}
-
+		$(window).resize(function () {
+			$('div#shadow').css({"height": document.documentElement.clientHeight + "px", "width": document.documentElement.clientWidth + "px"})
+		})
 		</script>
 	</head>
 	<body>
-		<dialog id="help">
+		<div id="shadow"></div>
+		<div id="dialog">
 			<h3>キーボードショートカット</h3>
 			<table>
-				<tr id="shortcut">
+				<tr>
 					<th>/</th>
 					<td>キーボードショートカットを 表示 / 非表示</td>
 				</tr>
-				<tr id="close">
+				<tr>
 					<th>ESC</th>
 					<td>キーボードショートカットを 非表示</td>
 				</tr>
-				<tr id="Right">
+				<tr>
 					<th>→</th>
 					<td>次へ (自動再生でない時のみ)</td>
 				</tr>
-				<tr id="Left">
+				<tr>
 					<th>←</th>
 					<td>戻る (自動再生でない時のみ)</td>
 				</tr>
-				<tr id="pause">
+				<tr>
 					<th>スペースキー</th>
 					<td>一時停止 / 再開 (自動再生時のみ)</td>
 				</tr>
@@ -211,7 +236,7 @@
 					<td>終了</td>
 				</tr>
 			</table>
-		</dialog>
+		</div id="dialog">
 		<div id="video"><img id="presen" src="TestImage.jpg"></div><br>
 		<div id="selector">
 			<select id="presenFile"><option value="" selected disabled>選択してください</option></select>
