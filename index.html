@@ -3,14 +3,25 @@
 	<head>
 		<title>プレゼンサイト</title>
 		<meta charset="utf-8">
-		<script type="text/javascript" src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+		<script type="text/javascript" src="/Seika/jquery.min.js"></script>
 		<style type="text/css">
 			error {
 				color: #B9000A;
 			}
+			dialog {
+				padding: 0;
+				border: 0;
+				border-radius: 0.6rem;
+				box-shadow: 0 0 1em black;
+			}
+						 
+			dialog::backdrop {
+				/* 背景を半透明のブラックにする */
+				background-color: rgba(0, 0, 0, 0.4);
+			}
 		</style>
 		<script type="text/javascript">
-		var Presens, Presen, // プレゼンデータ
+		var Presens, Presen, started, // プレゼンデータ
 			EditPresen, pageCt, // テキスト, ページ
 			speechToText, voice, word, textCt, goNext, // 音声
 			option // HTML
@@ -23,7 +34,7 @@
 			$('span#pages')[0].innerText = `${pageCt} / ${Presen.data.page}`
 			$('img#presen')[0].src = Presen.dir + `${pageCt}.${Presen.data.type}`
 			if (Presen.data.script) {
-				word = Presen.data.script[pageCt - 1]
+				word = Presen.data.speech[pageCt - 1]
 				textCt = 0
 				voice = new Audio(`https://www.yukumo.net/api/v2/aqtk1/koe.mp3?type=f1&effect=none&boyomi=false&speed=110&volume=100&kanji=${word}`)
 				voice.play()
@@ -47,7 +58,7 @@
 				$('span#text')[0].innerText += word[textCt]
 				textCt++
 				if (textCt < word.length){
-					setTimeout(speechToText, (',.，．、。'.indexOf(word[textCt]) != -1) ? 300 : 145)
+					setTimeout(speechToText, (',.，．、。'.indexOf(word[textCt]) != -1) ? 290 : 130)
 				} else {
 					goNext = true
 					if ($('input#CheckAuto')[0].checked) {
@@ -66,11 +77,12 @@
 			goNext = true
 			$('div#Player')[0].style.display = 'none'
 			$('div#selector')[0].style.display = 'block'
-			$.ajax({ url: 'Presens/public.json', dataType: 'json', type: 'get' }).done(function (data) { // 公開するプレゼンを表示
+			$.ajax({ url: 'Presens/public.json', dataType: 'json', type: 'post' }).done(function (data) { // 公開するプレゼンを表示
 				Presens = data
 				for (PName in Presens) {
 					option = document.createElement('option')
-					option.text = option.value = PName
+					option.value = PName
+					option.text = (Presens[PName].name) ? Presens[PName].name : PName
 					$('select#presenFile')[0].appendChild(option)
 				}
 			})
@@ -78,10 +90,11 @@
 				pageCt = 0
 				Presen = {dir: `Presens/${$('select#presenFile')[0].value}/`, data: Presens[$('select#presenFile')[0].value]}
 				$('span#pages')[0].innerText = `0 / ${Presen.data.page}`
+				if (! Presen.data.type) { Presen.data.type = 'jpg' }
 				$('img#presen')[0].src = Presen.dir + `1.${Presen.data.type}`
 				if (Presen.data.script) {
 					Presen.data.time = 3000
-					$.ajax(Presen.dir + Presen.data.script).done(function (data) { Presen.data.script = data.split('\n') })
+					$.ajax(Presen.dir + Presen.data.script).done(function (data) { Presen.data.speech = data.split('\n\n') })
 				} else {
 					Presen.data.time = 5000
 				}
@@ -91,6 +104,7 @@
 					$('error#selector')[0].innerText = 'プレゼンファイルを選んでください'
 				} else {
 					paused = false
+					started = true
 					$('div#selector')[0].style.display = 'none'
 					$('div#Player')[0].style.display = 'block'
 					if ($('input#CheckAuto')[0].checked) {
@@ -105,14 +119,14 @@
 			}
 
 			$('button#back')[0].onclick = function () {
-				if (goNext && ! paused) {
+				if (goNext && ! paused && started) {
 					if (pageCt <= 1) { pageCt = Presen.data.page + 1 }
 					pageCt--
 					EditPresen()
 				}
 			}
 			$('button#next')[0].onclick = function () {
-				if (goNext && ! paused) {
+				if (goNext && ! paused && started) {
 					if (pageCt >= Presen.data.page) { pageCt = 0 }
 					pageCt++
 					EditPresen()
@@ -120,6 +134,7 @@
 			}
 			$('button#stop')[0].onclick = function () {
 				goNext = true
+				started = false
 				pagect = textCt = 0
 				if (Presen.data.script) {
 					voice.pause(); voice.currentTime = 0
@@ -132,6 +147,7 @@
 			}
 			$('button#pause')[0].onclick = function () {
 				paused = (paused) ? false : true
+				$('button#pause')[0].innerText = (paused) ? '再開' : '一時停止'
 				if (Presen.data.script) {
 					if (paused) {
 						voice.pause()
@@ -154,6 +170,12 @@
 					case 'KeyQ':
 						$('button#stop')[0].onclick()
 						break
+					case 'Slash':
+						if (event.metaKey || event.ctrlKey) { ($('dialog#help')[0].open) ? $('dialog#help')[0].close() : $('dialog#help')[0].showModal() }
+						break
+					case 'Escape':
+						if (event.metaKey || event.ctrlKey) { $('dialog#help')[0].close() }
+						break
 				}
 			}
 		}
@@ -161,6 +183,35 @@
 		</script>
 	</head>
 	<body>
+		<dialog id="help">
+			<h3>キーボードショートカット</h3>
+			<table>
+				<tr id="shortcut">
+					<th>/</th>
+					<td>キーボードショートカットを 表示 / 非表示</td>
+				</tr>
+				<tr id="close">
+					<th>ESC</th>
+					<td>キーボードショートカットを 非表示</td>
+				</tr>
+				<tr id="Right">
+					<th>→</th>
+					<td>次へ (自動再生でない時のみ)</td>
+				</tr>
+				<tr id="Left">
+					<th>←</th>
+					<td>戻る (自動再生でない時のみ)</td>
+				</tr>
+				<tr id="pause">
+					<th>スペースキー</th>
+					<td>一時停止 / 再開 (自動再生時のみ)</td>
+				</tr>
+				<tr>
+					<th>Q</th>
+					<td>終了</td>
+				</tr>
+			</table>
+		</dialog>
 		<div id="video"><img id="presen" src="TestImage.jpg"></div><br>
 		<div id="selector">
 			<select id="presenFile"><option value="" selected disabled>選択してください</option></select>

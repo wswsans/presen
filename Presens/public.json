@@ -1,11 +1,11 @@
 {
-	"20200322": {
-		"page": 9,
-		"type": "jpg",
-		"script": "script.txt"
+	"Demo-NoScript": {
+		"name": "原稿なしプレゼン",
+		"page": 9
 	},
-	"20191222": {
-		"page": 24,
-		"type": "jpg"
+	"WhatIsPresenSite": {
+		"name": "プレゼンサイトの解説",
+		"page": 10,
+		"script": "script.txt"
 	}
 }
