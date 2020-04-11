@@ -77,7 +77,7 @@
 			goNext = true
 			$('div#Player')[0].style.display = 'none'
 			$('div#selector')[0].style.display = 'block'
-			$.ajax({ url: 'Presens/public.json', dataType: 'json', type: 'post' }).done(function (data) { // 公開するプレゼンを表示
+			$.ajax({ url: 'Presens/public.json', dataType: 'json', type: '' }).done(function (data) { // 公開するプレゼンを表示
 				Presens = data
 				for (PName in Presens) {
 					option = document.createElement('option')
