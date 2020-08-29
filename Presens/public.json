@@ -7,5 +7,10 @@
 		"name": "プレゼンサイトの解説",
 		"page": 10,
 		"script": "script.txt"
+	},
+	"20200830": {
+		"name": "8月成果発表",
+		"page": 23,
+		"script": "script.txt"
 	}
 }
