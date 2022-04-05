@@ -41,7 +41,7 @@
 		<script type="text/javascript">
 		var Presens, Presen, started, // プレゼンデータ
 			EditPresen, pageCt, // テキスト, ページ
-			speechToText, voice, word, textCt, goNext, // 音声
+			speechToText, voice, type, word, textCt, goNext, // 音声
 			option // HTML
 
 		paused = false
@@ -54,7 +54,7 @@
 			if (Presen.data.script) {
 				word = Presen.data.speech[pageCt - 1]
 				textCt = 0
-				voice = new Audio(`https://www.yukumo.net/api/v2/aqtk1/koe.mp3?type=f1&effect=none&boyomi=false&speed=110&volume=100&kanji=${word}`)
+				voice = new Audio(`https://www.yukumo.net/api/v2/aqtk1/koe.mp3?type=${type}&effect=none&boyomi=false&speed=110&volume=100&kanji=${word}`)
 				voice.play()
 				speechToText()
 			} else {
@@ -123,6 +123,7 @@
 				} else {
 					paused = false
 					started = true
+					type = $('select#voiceType')[0].value
 					$('div#selector')[0].style.display = 'none'
 					$('div#Player')[0].style.display = 'block'
 					if ($('input#CheckAuto')[0].checked) {
@@ -246,6 +247,10 @@
 		<div id="video"><img id="presen" src="TestImage.jpg"></div><br>
 		<div id="selector">
 			<select id="presenFile"><option value="" selected disabled>選択してください</option></select>
+			<select id="voiceType">
+				<option value="f1">霊夢</option>
+				<option value="f2">魔理沙</option>
+			</select>
 			<input type="checkbox" id="CheckAuto">
 			<label for="CheckAuto">自動再生</label>
 			<button id="start">クリックして始める</button>
