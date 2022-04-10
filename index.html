@@ -181,6 +181,9 @@
 			$('div#shadow')[0].onclick = function () {
 				$('div#shadow')[0].style.display = $('div#dialog')[0].style.display = 'none'
 			}
+			$('img#presen')[0].onclick = function (e) {
+				e.target.requestFullscreen();
+			}
 			document.onkeydown = function (event) {
 				switch (event.code) {
 					case 'ArrowLeft':
